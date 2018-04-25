@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IModelSDao">
+    
+    <insert id="addModelS">
+        INSERT INTO model (model_name, tool_id, model_url, analysis_flag, project_id) 
+            VALUES (#{param.model_name}, #{param.tool_id}, #{param.model_url}, #{param.analysis_flag}, #{param.project_id});
+    </insert>
+    
+    <select id="queryModelByCondition" resultType="com.spring.model.ModelS" parameterType="map">
+        SELECT m.*,p.project_name AS project_name  FROM  model m 
+                LEFT JOIN project p ON  m.project_id = p.id
+        WHERE  1 = 1 
+        <if test="param.model_url != null">
+            AND m.model_url = #{param.model_url}
+        </if>
+        
+        <if test="param.project_id != null">
+            AND m.project_id = #{param.project_id}
+        </if>
+        
+        <if test="param.analysis_flag != null">
+            AND m.analysis_flag = #{param.analysis_flag}
+        </if>
+        
+        <if test="param.id != null">
+            AND m.id = #{param.id}
+        </if>
+        
+        <if test="param.limit_num != null">
+            LIMIT #{param.limit_num}
+        </if>
+    </select>
+    
+    <update id="updateModelsById" parameterType="map">
+        UPDATE model SET  id = id
+        <if test="param.analysis_flag != null">
+            ,analysis_flag = #{param.analysis_flag}
+        </if>
+        WHERE  1  =  1
+        <if test="param.id != null">
+            AND  id = #{param.id}
+        </if>
+        
+    </update>
+    
+</mapper>

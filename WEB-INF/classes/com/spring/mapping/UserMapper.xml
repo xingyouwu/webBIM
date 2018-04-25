@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IUserDao">
+
+    <select id="queryUserByCondition" resultType="com.spring.model.User" parameterType="map">
+        SELECT * FROM user
+        WHERE 1 = 1 
+        <if test="param.id != null">
+            AND id = #{param.id}
+        </if>
+        <if test="param.tel != null">
+            AND tel = #{param.tel}
+        </if>
+        LIMIT 1
+    </select>
+    
+    <insert id="addUser" >
+        INSERT INTO user (tel, user_name, password, code, code_time) VALUES (#{param.tel}, #{param.user_name}, NULL, NULL, now());
+    </insert>
+</mapper>

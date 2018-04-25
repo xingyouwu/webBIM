@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IBackgroundImgDao">
+    
+    <select id="queryBackgroundImgS" resultType="com.spring.model.BackgroundImg" parameterType="map">
+        SELECT * FROM background_img WHERE id &gt; 3
+    </select>
+    
+    <insert id="addBackgroundImg">
+        INSERT  INTO  background_img (img_name, img_url) VALUES (#{param.img_name}, #{param.img_url});
+    </insert>
+    
+    <delete id="delBackgroundImg" parameterType="int">
+         DELETE FROM background_img  WHERE id = #{id}
+    </delete>
+    
+</mapper>

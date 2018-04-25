@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IModelPropertyDao">
+    
+    <insert id="addModelsPropertyS" parameterType="map">
+        INSERT INTO 
+            model_property(`glid`,`externalId`,`propertyTypeName`,`propertySetName`,`propertyname`,`ifcurl`,`value`,`modelName`,`groupname`,`groupname_en`,`modelDataId`)
+        VALUES ${param.dataS}
+    </insert>
+    
+    <select id="queryModelProperty" resultType="com.spring.model.ModelProperty" parameterType="map">
+        SELECT * FROM model_property WHERE  1 =  1
+        
+            <if test="param.modelDataId != null">
+                AND  modelDataId = #{param.modelDataId}
+            </if>
+            <if test="param.externalId != null">
+                AND  externalId = #{param.externalId}
+            </if>
+            <if test="param.propertyTypeName != null">
+                AND  propertyTypeName = #{param.propertyTypeName}
+            </if>
+            ORDER BY id
+    </select>
+    
+    <select id="queryModelPropertyOne" resultType="com.spring.model.ModelProperty" parameterType="map">
+        SELECT * FROM model_property  
+            WHERE 
+            externalId = #{param.externalId} 
+            AND propertyname = 'Name' 
+            AND modelDataId = #{param.modelDataId}
+         LIMIT 1
+    </select>
+    
+    <delete id="deleteModelsProperty" parameterType="map">
+        DELETE FROM model_property WHERE 1 = 1
+        <if test="param.mId != null">
+            AND modelDataId = #{param.mId}
+        </if>
+    </delete>
+    
+</mapper>

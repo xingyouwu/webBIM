@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IModelTypeDao">
+    
+    <insert id="addModelsTypeS" parameterType="map">
+        INSERT INTO 
+            model_type(`glid`,`pGlid`,`level`,`name`,`externalId`,`groupname`,`groupname_en`,`modelDataId`)
+        VALUES ${param.dataS}
+    </insert>
+    
+    <select id="queryModelsTypeByCondition" resultType="com.spring.model.ModelType" parameterType="map">
+        SELECT  m.*  , (SELECT COUNT(1)  FROM model_type WHERE pGlid = m.glid  ) AS lower_num
+        FROM    model_Type  m   WHERE    1 = 1
+        <if test="param.modelDataId != null">
+            AND m.modelDataId = #{param.modelDataId}
+        </if>
+        
+        <if test="param.pGlid != null">
+            AND m.pGlid = '${param.pGlid}'
+        </if>
+        
+        <if test="param.glid != null">
+            AND m.glid = '${param.glid}'
+        </if>
+    </select>
+    
+    <delete id="deleteModelType" parameterType="map">
+        DELETE FROM model_Type WHERE 1 = 1
+        <if test="param.mId != null">
+            AND modelDataId = #{param.mId}
+        </if>
+    </delete>
+    
+</mapper>

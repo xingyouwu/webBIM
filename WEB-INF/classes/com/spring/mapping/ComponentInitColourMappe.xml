@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IComponentInitColourDao">
+    
+    <select id="queryComponentInitColourData" resultType="com.spring.model.ComponentInitColour" parameterType="map">
+        SELECT *  FROM component_init_colour   WHERE 1 = 1   
+            <if test="param.project_id != null">
+                AND project_id  = #{param.project_id}
+            </if>
+            <if test="param.flag != null">
+                AND flag  = #{param.flag}
+            </if>
+    </select>
+    
+    <select id="queryComponentInitColourCount" resultType="com.spring.model.ComponentInitColour" parameterType="map">
+        SELECT * FROM component_init_colour   WHERE 1 = 1   
+            <if test="param.project_id != null">
+                AND project_id  = #{param.project_id}
+            </if>
+            <if test="param.externalId != null">
+                AND externalId  = #{param.externalId}
+            </if>
+            LIMIT 1
+    </select>
+    
+    <select id="queryComponentInitColourGroup" resultType="com.spring.model.ComponentInitColour" parameterType="map">
+        SELECT GROUP_CONCAT(externalId SEPARATOR '#') AS externalId,red,green,blue ,flag  
+            FROM   component_init_colour 
+            WHERE flag = 1  AND project_id = #{param.project_id}  GROUP BY red,green,blue
+        UNION
+        SELECT GROUP_CONCAT(externalId SEPARATOR '#') AS externalId,red,green,blue ,flag  
+            FROM component_init_colour 
+            WHERE flag = 0   AND project_id = #{param.project_id} GROUP BY flag
+    </select>
+    
+    <insert id="addComponentInitColour" parameterType="com.spring.model.ComponentInitColour">
+        INSERT INTO component_init_colour(
+            project_id,
+            externalId,
+            red,
+            green,
+            blue,
+            component_name,
+            flag)
+            VALUES(
+            #{param.project_id},
+            #{param.externalId},
+            #{param.red},
+            #{param.green},
+            #{param.blue},
+            #{param.component_name},
+            #{param.flag})
+    </insert>
+    
+    <update id="updateComponentInitColour" parameterType="map">
+        UPDATE component_init_colour SET 
+        id = id
+        ,red  = #{param.red}
+        ,green  = #{param.green}
+        ,blue  = #{param.blue}
+        <if test="param.externalId != null">
+            ,externalId  = #{param.externalId}
+        </if>
+        <if test="param.component_name != null">
+            ,component_name  = #{param.component_name}
+        </if>
+        <if test="param.flag != null">
+            ,flag  = #{param.flag}
+        </if>
+        WHERE  id = #{param.id}
+    </update>
+    
+    <delete id="deleteComponentInitColour" parameterType="int">
+        DELETE FROM component_init_colour  WHERE id = #{id} 
+    </delete>
+</mapper>

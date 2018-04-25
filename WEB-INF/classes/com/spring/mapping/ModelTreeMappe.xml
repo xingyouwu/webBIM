@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IModelTreeDao">
+    
+    <insert id="addModelsTreeS" parameterType="map">
+        INSERT INTO 
+            model_tree(`glid`,`pGlid`,`level`,`name`,`externalId`,`groupname`,`groupname_en`,`modelDataId`)
+        VALUES ${param.dataS}
+    </insert>
+    
+    <select id="queryModelsTreeByCondition" resultType="com.spring.model.ModelTree" parameterType="map">
+        SELECT  m.*  , (SELECT COUNT(1)  FROM model_tree WHERE pGlid = m.glid  ) AS lower_num
+            FROM    model_tree  m  WHERE    1 = 1
+        <if test="param.modelDataId != null">
+            AND m.modelDataId = #{param.modelDataId}
+        </if>
+        
+        <if test="param.pGlid != null">
+            AND m.pGlid = '${param.pGlid}'
+        </if>
+        
+        <if test="param.glid != null">
+            AND m.glid = '${param.glid}'
+        </if>
+        
+        <if test="param.EidS != null">
+            AND m.externalId IN(${param.EidS}) GROUP BY m.externalId  ORDER BY m.externalId,m.id 
+        </if>
+        
+        <if test="param.limitOne != null">
+            LIMIT 1 
+        </if>
+    </select>
+    
+    <delete id="deleteModelTree" parameterType="map">
+        DELETE FROM model_tree WHERE 1 = 1
+        <if test="param.mId != null">
+            AND modelDataId = #{param.mId}
+        </if>
+    </delete>
+    
+</mapper>

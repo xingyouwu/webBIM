@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IViewpointDao">
+    
+    <select id="queryViewpointById" resultType="com.spring.model.Viewpoint" parameterType="map">
+        SELECT  * from viewpoint where id = #{id}
+    </select>
+    
+    <update id="editViewpoint" parameterType="com.spring.model.Viewpoint">
+        UPDATE viewpoint SET  viewpoint_name = #{param.viewpoint_name}, `describe` = #{param.describe}  WHERE id =#{param.id}
+    </update>
+    
+    <insert id="addViewpoint" parameterType="com.spring.model.Viewpoint">
+        INSERT INTO viewpoint(viewpoint_name,`describe`,project_id,img_url,coordinate)
+                         VALUES(#{param.viewpoint_name},#{param.describe},#{param.project_id},#{param.img_url},#{param.coordinate})
+    </insert>
+        
+    <delete id="delViewpoint" parameterType="int">
+         DELETE FROM viewpoint  WHERE id = #{id} 
+    </delete>
+    
+    <select id="queryViewpointS" resultType="com.spring.model.Viewpoint" parameterType="map">
+        SELECT  * from viewpoint where 1 = 1
+        <if test="param.project_id != null">
+            AND  project_id = #{param.project_id}
+        </if>
+    </select>
+    
+</mapper>

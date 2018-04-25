@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.ICollisionDao">
+    
+    <select id="queryCollisionResultData" resultType="com.spring.model.CollisionResult" parameterType="map">
+         SELECT mcr.* ,
+               mct.collision_test AS collision_test,
+               mct.collision_test_type AS collision_test_type,
+               mct.test_mode AS test_mode
+        FROM collision_result mcr 
+                 LEFT JOIN collision_test mct ON mcr.collision_id = mct.id
+        WHERE 1 = 1   
+            <if test="param.project_id != null">
+                AND mct.project_id  = #{param.project_id}
+            </if>
+            <if test="param.ignore_flag != null">
+                AND mcr.ignore_flag  = #{param.ignore_flag}
+            </if>
+    </select>
+    
+    <select id="queryCollisionTestDictionariesByMid" resultType="com.spring.model.CollisionTestDictionaries" parameterType="map">
+        SELECT mctd.id AS id ,CONCAT(IF(ISNULL(mctd.name_zh),'(无)',mctd.name_zh),'_',mctd.name_en) AS name_zh  
+            FROM collision_test_dictionaries mctd 
+                LEFT JOIN (select * from model_property where 1 = 1 GROUP BY groupname) mmp  ON mmp.groupname = mctd.name_en
+                LEFT JOIN model m  ON m.id = mmp.modelDataId 
+            WHERE m.id= #{param.mId}   
+            ORDER BY mctd.sort DESC,mctd.id
+        
+        <!-- 
+         SELECT mctd.id AS id ,CONCAT(IF(ISNULL(mctd.name_zh),'(无)',mctd.name_zh),'_',mctd.name_en) AS name_zh  
+            FROM collision_test_dictionaries mctd 
+                LEFT JOIN model_property mmp  ON mmp.groupname = mctd.name_en
+                LEFT JOIN model m  ON m.id = mmp.modelDataId 
+            WHERE m.id= #{param.mId}   GROUP BY mmp.groupname  
+            ORDER BY mctd.sort DESC,mctd.id
+         -->
+    </select>
+    
+    <select id="checkCollisionName" resultType="int" >
+        SELECT count(1) FROM collision_test WHERE collision_test = #{collision_test_name}
+    </select>
+    
+    <insert id="addCollisionTest">
+        INSERT INTO collision_test(
+            test_mode,collision_test,collision_test_type,
+            add_people,add_time,log,
+            model_type_one,model_type_tow,model_id_one,model_id_tow,
+            ignore_rule,tolerance,project_id,state)
+            VALUES(
+            #{param.test_mode},#{param.collision_test},#{param.collision_test_type},
+            #{param.add_people},now(),#{param.log},
+            #{param.model_type_one},#{param.model_type_tow},#{param.model_id_one},#{param.model_id_tow},
+            #{param.ignore_rule},#{param.tolerance},#{param.project_id},1)
+    </insert>
+    
+    <select id="queryCollisionTestByName" resultType="com.spring.model.CollisionTest">
+        SELECT
+            mct.*,
+            (SELECT name_en FROM collision_test_dictionaries WHERE id = mct.model_type_one) AS model_type_one_value,
+            (SELECT name_en FROM collision_test_dictionaries WHERE id = mct.model_type_tow) AS model_type_tow_value,
+            (SELECT LEFT (model_url,char_length(model_url) - 4) AS file_name  FROM    model WHERE   id = mct.model_id_one) AS model_id_one_value,
+            (SELECT LEFT (model_url,char_length(model_url) - 4) AS file_name  FROM    model WHERE   id = mct.model_id_tow) AS model_id_tow_value
+        FROM   collision_test mct
+        WHERE collision_test = #{param.collision_test} LIMIT 1
+    </select>
+    
+    <select id="queryCollisionTest" resultType="com.spring.model.CollisionTest">
+        SELECT
+            mct.*,
+            (SELECT CONCAT(IF(ISNULL(name_zh),'(无)',name_zh),'-',name_en) AS name_zh FROM  collision_test_dictionaries WHERE id = mct.model_type_one) AS model_type_one_value,
+            (SELECT CONCAT(IF(ISNULL(name_zh),'(无)',name_zh),'-',name_en) AS name_zh FROM  collision_test_dictionaries WHERE id = mct.model_type_tow) AS model_type_tow_value,
+            (SELECT LEFT (model_url,char_length(model_url) - 4) AS file_name  FROM    model WHERE   id = mct.model_id_one) AS model_id_one_value,
+            (SELECT LEFT (model_url,char_length(model_url) - 4) AS file_name  FROM    model WHERE   id = mct.model_id_tow) AS model_id_tow_value
+        FROM   collision_test mct
+        WHERE  mct.state = #{param.state}
+    </select>
+    
+    <insert id="addCollisionResult">
+        INSERT INTO 
+            collision_result(
+                `collision_id`,
+                `collision_position`,
+                `collision_coordinate`,
+                `intersect_depth`,
+                `intersect_volume`,
+                `ignore_flag`,
+                `guid_one`,
+                `guid_tow`)
+        VALUES ${param.dataS}
+    </insert>
+    
+    <update id="updateCollisionTest">
+        UPDATE collision_test SET state = 0  WHERE  id = #{param.id}
+    </update>
+    
+    <update id="updateCollisionResult">
+        UPDATE collision_result SET ignore_flag = 0  WHERE  id = #{id}
+    </update>
+    
+</mapper>

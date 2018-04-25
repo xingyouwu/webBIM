@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.IProjectDao">
+
+    <select id="queryProjectByCondition" resultType="com.spring.model.Project" parameterType="map">
+        SELECT p.*,pt.project_tool AS project_tool,
+               (SELECT COUNT(1) FROM model WHERE project_id = p.id AND analysis_flag = 0) AS analysis_flag
+        FROM project p
+            LEFT JOIN project_tool pt ON pt.id = p.project_tool_id
+        WHERE 1 = 1 
+        <if test="param.user_id != null">
+            AND (p.user_id = #{param.user_id}  OR p.whether_open = #{param.whether_open} )
+        </if>
+        <if test="param.user_id == null">
+            AND  p.whether_open = #{param.whether_open} 
+        </if>
+    </select>
+    
+    <insert id="addProject">
+        INSERT INTO project (project_name, project_tool_id, whether_open, user_id, add_time, img_url) 
+             VALUES (#{param.project_name}, #{param.project_tool_id}, #{param.whether_open}, #{param.user_id}, now(), #{param.img_url});
+    </insert>
+    
+    <select id="queryProjectByNew" resultType="com.spring.model.Project" parameterType="map">
+        SELECT p.* ,bi.img_url AS bg_img  
+        FROM project p 
+            LEFT JOIN background_img bi on p.bg_img_id = bi.id
+        
+        WHERE 1 = 1 
+        <if test="param.project_name != null">
+            AND p.project_name = #{param.project_name}
+        </if>
+        <if test="param.id != null">
+            AND p.id = #{param.id}
+        </if>
+        LIMIT 1
+    </select>
+    
+    <update id="updateProject">
+        UPDATE project SET  id = id
+        <if test="param.img_url != null">
+            ,img_url = #{param.img_url}  
+        </if>
+        <if test="param.bg_img_id != null">
+            ,bg_img_id = #{param.bg_img_id}  
+        </if>
+        <if test="param.coordinate != null">
+            ,coordinate = #{param.coordinate}  
+        </if>
+        
+        WHERE id =#{param.id}
+    </update>
+</mapper>

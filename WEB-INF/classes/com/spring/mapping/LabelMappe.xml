@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.spring.dao.ILabelDao">
+    
+    <select id="queryLabelType" resultType="com.spring.model.LabelType" parameterType="map">
+        SELECT * FROM label_type WHERE  1 =  1 ORDER BY id
+    </select>
+    
+    <select id="queryLabelImg" resultType="com.spring.model.LabelImg" parameterType="map">
+        SELECT * FROM label_img WHERE  1 =  1 ORDER BY id
+    </select>
+    
+    <insert id="addLabelImg" parameterType="com.spring.model.LabelImg">
+        INSERT INTO label_img (img_name, img_url) VALUES (#{param.img_name}, #{param.img_url});
+    </insert>
+    
+    <insert id="addLabel" parameterType="com.spring.model.Label">
+        INSERT INTO label (label_name, `describe`, label_type_id, add_people, add_time, coordinate, label_img_id,project_id) 
+            VALUES (#{param.label_name}, #{param.describe}, #{param.label_type_id}, #{param.add_people}, now(), #{param.coordinate}, #{param.label_img_id}, #{param.project_id});
+    </insert>
+    
+    <select id="queryLabel" resultType="com.spring.model.Label" parameterType="map">
+        SELECT l.*,li.img_url AS label_img ,lt.label_type_name AS label_type  FROM label l 
+            LEFT JOIN label_img li ON li.id = l.label_img_id
+            LEFT JOIN label_type lt ON lt.id = l.label_type_id
+        WHERE  1 =  1 
+        AND l.project_id = #{param.project_id}
+        ORDER BY l.id
+    </select>
+    
+</mapper>
